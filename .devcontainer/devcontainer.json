@@ -25,6 +25,7 @@
           "cschleiden.vscode-github-actions",
           "ryanluker.vscode-coverage-gutters",
           "hbenl.vscode-test-explorer",
+          "vignaeshrama.sfdx-package-xml-generator",
           // Formatters
           "esbenp.prettier-vscode",
           "yzhang.markdown-all-in-one",
