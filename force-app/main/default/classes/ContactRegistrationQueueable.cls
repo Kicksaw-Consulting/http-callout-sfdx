@@ -21,6 +21,7 @@ public class ContactRegistrationQueueable implements Queueable, Database.AllowsC
                 if (response.getStatusCode() == 200) {
                     // optionally log the success response
                     logger.log('Success: ' + response.getStatusCode() + ' - ' + response.getBody());
+                    System.debug('Success: ' + response.getStatusCode() + ' - ' + response.getBody());
                     
                     // Success - parse response and create a contact variable with the external id
                     Map<String, Object> responseData = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
