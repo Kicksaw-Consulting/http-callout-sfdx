@@ -1,29 +1,27 @@
 ## Overview
 
-This Python Click script provides two main functions for working with Salesforce OmniScript data, featuring **beautiful Rich library formatting** with colorized output, syntax highlighting, and auto-sizing tables:
+This Python Click script provides two main functions for working with Salesforce OmniScript data:
 
 ### Use Case 1: Get OmniScript Structure (Assessments GET)
 Calls the [OmniScript Discovery Framework API](https://developer.salesforce.com/docs/atlas.en-us.industries_reference.meta/industries_reference/connect_resources_store_discovery_framework_structure.htm) with an omniScriptId and returns the 
-[omniscript output](https://developer.salesforce.com/docs/atlas.en-us.industries_reference.meta/industries_reference/connect_responses_omniscript_output.htm) as **colorized JSON with syntax highlighting** and a **summary table** showing key properties.
+[omniscript output](https://developer.salesforce.com/docs/atlas.en-us.industries_reference.meta/industries_reference/connect_responses_omniscript_output.htm) as formatted JSON with a summary table showing key properties.
 
 ### Use Case 2: List All OmniScript Processes
-Executes a SOQL query to retrieve all OmniScript processes and displays them in a **beautiful auto-sizing table** (no truncation) or JSON output.
+Executes a SOQL query to retrieve all OmniScript processes and displays them in a table format or JSON output.
 
-## ✨ Visual Features
+## Output Features
 
-This script leverages the **Rich library** to provide a beautiful, modern CLI experience:
+### Get Command Output:
+- **Summary Table**: Key OmniScript properties (Name, Type, Version, etc.) displayed in a structured table
+- **JSON Syntax Highlighting**: Full structure with formatted output and proper indentation
+- **Structured Layout**: Organized display with panels and borders for readability
+- **File Output**: Raw JSON saved to files when using `--output-path`
 
-### 🎨 Get Command Features:
-- **📊 Summary Table**: Key OmniScript properties (Name, Type, Version, etc.) displayed in a colorized table
-- **🌈 JSON Syntax Highlighting**: Full structure with color-coded keys, values, and proper indentation
-- **🎯 Structured Layout**: Clean panels and borders for easy reading
-- **💾 File Output**: Raw JSON still saved to files when using `--output-path`
-
-### 📊 List Command Features:
-- **🔧 Auto-Sizing Tables**: Columns automatically adjust to content (no more truncation!)
-- **🎨 Color-Coded Status**: Active/Inactive processes with emoji indicators
-- **📋 Rich Formatting**: Beautiful borders, headers, and consistent styling
-- **📈 Smart Layout**: Tables adapt to terminal width and content length
+### List Command Output:
+- **Auto-Sizing Tables**: Columns automatically adjust to content to prevent truncation
+- **Status Indicators**: Active/Inactive processes clearly marked
+- **Formatted Tables**: Structured headers and consistent styling
+- **Responsive Layout**: Tables adapt to terminal width and content length
 
 ## General Technical Requirements
 
@@ -80,12 +78,12 @@ uv sync
 - `click` - CLI framework
 - `python-dotenv` - Environment variable management
 - `simple-salesforce` - Salesforce API client
-- `rich` - Beautiful terminal formatting and colors
+- `rich` - Terminal formatting and table display
 - `requests` - HTTP client for API calls
 
 ### Running the Script
 
-The script supports multiple commands with **beautiful Rich formatting**. All visual enhancements work in any modern terminal with color support. Use `--help` to see available commands and options.
+The script supports multiple commands with formatted output. Use `--help` to see available commands and options.
 
 ```bash
 # Get main help (shows available commands)
@@ -164,7 +162,7 @@ python scripts/python/omniscript_discovery.py list --instance DEV
 
 ### Sample Output
 
-#### 🎨 Get Command Output (with Rich formatting)
+#### Get Command Output
 
 **Summary Table:**
 ```
@@ -183,7 +181,7 @@ python scripts/python/omniscript_discovery.py list --instance DEV
 └──────────────────────┴─────────────────────┘
 ```
 
-**Followed by colorized JSON with syntax highlighting:**
+**Followed by formatted JSON output:**
 ```json
 {
   "description": null,
@@ -207,7 +205,7 @@ python scripts/python/omniscript_discovery.py list --instance DEV
 }
 ```
 
-#### 📊 List Command Output (auto-sizing table)
+#### List Command Output
 ```
                                                  🔧 OmniScript Processes                                                 
 ┏━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┓
@@ -219,4 +217,4 @@ python scripts/python/omniscript_discovery.py list --instance DEV
 └────────────┴───────────┴───────────┴──────────┴─────────┴────────┴───────────────────────────────┴────────────────────┘
 ```
 
-> 💫 **Note**: All output features full color syntax highlighting and responsive formatting in your terminal!
+**Note**: Output includes formatted tables and JSON syntax highlighting for improved readability.
