@@ -1,13 +1,29 @@
 ## Overview
 
-This Python Click script provides two main functions for working with Salesforce OmniScript data:
+This Python Click script provides two main functions for working with Salesforce OmniScript data, featuring **beautiful Rich library formatting** with colorized output, syntax highlighting, and auto-sizing tables:
 
 ### Use Case 1: Get OmniScript Structure (Assessments GET)
 Calls the [OmniScript Discovery Framework API](https://developer.salesforce.com/docs/atlas.en-us.industries_reference.meta/industries_reference/connect_resources_store_discovery_framework_structure.htm) with an omniScriptId and returns the 
-[omniscript output](https://developer.salesforce.com/docs/atlas.en-us.industries_reference.meta/industries_reference/connect_responses_omniscript_output.htm) as well-formatted JSON so that users can see the structure for various omniscripts.
+[omniscript output](https://developer.salesforce.com/docs/atlas.en-us.industries_reference.meta/industries_reference/connect_responses_omniscript_output.htm) as **colorized JSON with syntax highlighting** and a **summary table** showing key properties.
 
 ### Use Case 2: List All OmniScript Processes
-Executes a SOQL query to retrieve all OmniScript processes and displays them in a rich table format or JSON output.
+Executes a SOQL query to retrieve all OmniScript processes and displays them in a **beautiful auto-sizing table** (no truncation) or JSON output.
+
+## ✨ Visual Features
+
+This script leverages the **Rich library** to provide a beautiful, modern CLI experience:
+
+### 🎨 Get Command Features:
+- **📊 Summary Table**: Key OmniScript properties (Name, Type, Version, etc.) displayed in a colorized table
+- **🌈 JSON Syntax Highlighting**: Full structure with color-coded keys, values, and proper indentation
+- **🎯 Structured Layout**: Clean panels and borders for easy reading
+- **💾 File Output**: Raw JSON still saved to files when using `--output-path`
+
+### 📊 List Command Features:
+- **🔧 Auto-Sizing Tables**: Columns automatically adjust to content (no more truncation!)
+- **🎨 Color-Coded Status**: Active/Inactive processes with emoji indicators
+- **📋 Rich Formatting**: Beautiful borders, headers, and consistent styling
+- **📈 Smart Layout**: Tables adapt to terminal width and content length
 
 ## General Technical Requirements
 
@@ -60,9 +76,16 @@ source .venv/bin/activate
 uv sync
 ```
 
+**Dependencies include:**
+- `click` - CLI framework
+- `python-dotenv` - Environment variable management
+- `simple-salesforce` - Salesforce API client
+- `rich` - Beautiful terminal formatting and colors
+- `requests` - HTTP client for API calls
+
 ### Running the Script
 
-The script now supports multiple commands. Use `--help` to see available commands and options.
+The script supports multiple commands with **beautiful Rich formatting**. All visual enhancements work in any modern terminal with color support. Use `--help` to see available commands and options.
 
 ```bash
 # Get main help (shows available commands)
@@ -141,13 +164,59 @@ python scripts/python/omniscript_discovery.py list --instance DEV
 
 ### Sample Output
 
-#### Rich Table Output (list command)
+#### 🎨 Get Command Output (with Rich formatting)
+
+**Summary Table:**
 ```
-🔧 OmniScript Processes
-┏━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Name                    ┃ Type       ┃ SubType       ┃ Language ┃ Version ┃ Active ┃ Unique Name                  ┃ ID               ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
-│ Customer Registration   │ OmniScript │ Registration  │ English │   1.0  │ ✅ Yes │ CustomerRegistration         │ a0X123456789abcd │
-│ Account Assessment      │ OmniScript │ Assessment    │ English │   2.1  │ ❌ No  │ AccountAssessment            │ a0X987654321xyz  │
-└─────────────────────────┴────────────┴───────────────┴────────┴────────┴────────┴──────────────────────────────┴──────────────────┘
+            📊 OmniScript Summary             
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┓
+┃ Property             ┃ Value               ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━┩
+│ Name                 │ PRAPARE             │
+│ Type                 │ Screening           │
+│ SubType              │ PRAPARE             │
+│ Language             │ English             │
+│ Version              │ 3.0                 │
+│ Designer Type        │ Discovery Framework │
+│ Usage Type           │ Default             │
+│ Total Elements       │ 1                   │
+└──────────────────────┴─────────────────────┘
 ```
+
+**Followed by colorized JSON with syntax highlighting:**
+```json
+{
+  "description": null,
+  "designerCustomizationType": "Discovery Framework",
+  "discoveryFrameworkUsageType": "Default",
+  "elements": [
+    {
+      "customTypeDetails": {
+        "discoveryFramework": {
+          "questionCategory": "Demographic",
+          "questionDataType": "Radio",
+          "questionDeveloperName": "Housing_Situation"
+        }
+      },
+      "name": "Housing_Situation",
+      "type": "Radio"
+    }
+  ],
+  "language": "English",
+  "name": "PRAPARE"
+}
+```
+
+#### 📊 List Command Output (auto-sizing table)
+```
+                                                 🔧 OmniScript Processes                                                 
+┏━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┓
+┃ Name       ┃ Type      ┃ SubType   ┃ Language ┃ Version ┃ Active ┃ Unique Name                   ┃ ID                 ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━┩
+│ EPDS       │ Screening │ EPDS      │ English  │   2.0   │ ✅ Yes │ Screening_EPDS_English_2      │ 0jNfl0000000g5hEAA │
+│ PRAPARE    │ Screening │ PRAPARE   │ English  │   3.0   │ ✅ Yes │ Screening_PRAPARE_English_3   │ 0jNfl0000000g45EAA │
+│ Well Being │ Screening │ WellBeing │ English  │   6.0   │ ✅ Yes │ Screening_WellBeing_English_6 │ 0jNfl0000000gC9EAI │
+└────────────┴───────────┴───────────┴──────────┴─────────┴────────┴───────────────────────────────┴────────────────────┘
+```
+
+> 💫 **Note**: All output features full color syntax highlighting and responsive formatting in your terminal!

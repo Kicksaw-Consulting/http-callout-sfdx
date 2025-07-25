@@ -100,8 +100,6 @@ class SalesforceClient:
             headers = {
                 'Authorization': f'Bearer {self.sf.session_id}',
                 'Accept': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (compatible; SalesforceWorkbench)',
-                'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/json'
             }
             
@@ -280,16 +278,48 @@ def get_omniscript_structure(omniscript_id: str, instance: str, output_path: Opt
     click.echo(f"📊 Retrieving OmniScript structure for ID: {omniscript_id}")
     structure = client.get_omniscript_structure(omniscript_id)
     
-    # Format JSON output
+    # Format JSON output for console with Rich syntax highlighting
     if pretty:
         json_output = json.dumps(structure, indent=2, ensure_ascii=False)
     else:
         json_output = json.dumps(structure, ensure_ascii=False)
     
-    # Output to console
-    click.echo("\n📋 OmniScript Structure:")
-    click.echo("=" * 50)
-    click.echo(json_output)
+    # Output to console with Rich JSON formatting
+    from rich.json import JSON
+    from rich.panel import Panel
+    from rich.table import Table as RichTable
+    
+    console.print()
+    
+    # Create a summary table with key information
+    summary_table = RichTable(title="📊 OmniScript Summary", show_header=True, header_style="bold magenta")
+    summary_table.add_column("Property", style="cyan", width=20)
+    summary_table.add_column("Value", style="yellow")
+    
+    # Extract key information from structure
+    summary_table.add_row("Name", str(structure.get('name', 'N/A')))
+    summary_table.add_row("Type", str(structure.get('type', 'N/A')))
+    summary_table.add_row("SubType", str(structure.get('subType', 'N/A')))
+    summary_table.add_row("Language", str(structure.get('language', 'N/A')))
+    summary_table.add_row("Version", str(structure.get('versionNumber', 'N/A')))
+    summary_table.add_row("Designer Type", str(structure.get('designerCustomizationType', 'N/A')))
+    summary_table.add_row("Usage Type", str(structure.get('discoveryFrameworkUsageType', 'N/A')))
+    
+    # Count elements
+    elements = structure.get('elements', [])
+    element_count = len(elements)
+    summary_table.add_row("Total Elements", str(element_count))
+    
+    console.print(summary_table)
+    console.print()
+    
+    # Show detailed JSON structure
+    console.print(Panel.fit("📋 Detailed Structure (JSON)", style="bold green"))
+    console.print()
+    
+    # Create Rich JSON object with syntax highlighting
+    rich_json = JSON(json_output, indent=2 if pretty else None)
+    console.print(rich_json)
     
     # Write to file if path specified
     if output_path:
@@ -409,15 +439,15 @@ def display_processes_table(processes: List[Dict[str, Any]], output_path: Option
     
     table = Table(title="🔧 OmniScript Processes", show_header=True, header_style="bold magenta")
     
-    # Add columns
-    table.add_column("Name", style="cyan", no_wrap=True, width=25)
-    table.add_column("Type", style="green", width=12)
-    table.add_column("SubType", style="yellow", width=15)
-    table.add_column("Language", style="blue", width=8)
-    table.add_column("Version", justify="center", style="magenta", width=8)
-    table.add_column("Active", justify="center", style="bold", width=8)
-    table.add_column("Unique Name", style="white", width=30)
-    table.add_column("ID", style="dim", width=18)
+    # Add columns with auto-sizing (no fixed widths)
+    table.add_column("Name", style="cyan", no_wrap=True)
+    table.add_column("Type", style="green")
+    table.add_column("SubType", style="yellow")
+    table.add_column("Language", style="blue")
+    table.add_column("Version", justify="center", style="magenta")
+    table.add_column("Active", justify="center", style="bold")
+    table.add_column("Unique Name", style="white")
+    table.add_column("ID", style="dim")
     
     # Add rows
     for process in processes:
@@ -425,14 +455,9 @@ def display_processes_table(processes: List[Dict[str, Any]], output_path: Option
         active_status = "✅ Yes" if process.get('IsActive', False) else "❌ No"
         active_style = "bold green" if process.get('IsActive', False) else "bold red"
         
-        # Truncate long names and unique names
+        # Use full names without truncation (auto-sizing columns)
         name = str(process.get('Name', 'N/A'))
-        if len(name) > 23:
-            name = name[:20] + "..."
-            
         unique_name = str(process.get('UniqueName', 'N/A'))
-        if len(unique_name) > 28:
-            unique_name = unique_name[:25] + "..."
         
         table.add_row(
             name,
@@ -442,7 +467,7 @@ def display_processes_table(processes: List[Dict[str, Any]], output_path: Option
             str(process.get('VersionNumber', 'N/A')),
             active_status,
             unique_name,
-            str(process.get('Id', 'N/A'))[:18]
+            str(process.get('Id', 'N/A'))
         )
     
     # Display table
@@ -468,150 +493,6 @@ def display_processes_table(processes: List[Dict[str, Any]], output_path: Option
             click.echo(f"\n❌ Failed to write output file: {e}", err=True)
             sys.exit(1)
 
-
-@cli.command('debug')
-@click.argument('omniscript_id', required=True)
-@click.option(
-    '--instance', '-i',
-    default='DEFAULT',
-    help='Salesforce instance configuration to use from .env file (default: DEFAULT)'
-)
-@click.option(
-    '--raw-request', '-r',
-    is_flag=True,
-    help='Try making raw HTTP requests with different headers'
-)
-def debug_api_call(omniscript_id: str, instance: str, raw_request: bool):
-    """Debug the Discovery Framework API call with various approaches.
-    
-    This command helps troubleshoot API connectivity issues by trying different
-    methods and showing detailed information about the requests and responses.
-    """
-    # Load credentials and connect
-    script_dir = Path(__file__).parent
-    env_file = script_dir / '.env'
-    if not env_file.exists():
-        click.echo(f"❌ .env file not found at {env_file}", err=True)
-        sys.exit(1)
-    
-    click.echo(f"🔑 Loading credentials for instance: {instance}")
-    credentials = load_credentials(instance)
-    
-    client = SalesforceClient(**credentials)
-    client.connect()
-    
-    click.echo(f"\n🔍 Testing Discovery Framework API for ID: {omniscript_id}")
-    
-    # Try different approaches
-    approaches = [
-        {
-            'name': 'Original URL with Discovery+Framework',
-            'url': f"/services/data/v62.0/connect/omniscript/{omniscript_id}?customType=Discovery+Framework"
-        },
-        {
-            'name': 'URL with Discovery%20Framework (percent encoding)',
-            'url': f"/services/data/v62.0/connect/omniscript/{omniscript_id}?customType=Discovery%20Framework"
-        },
-        {
-            'name': 'URL without customType parameter',
-            'url': f"/services/data/v62.0/connect/omniscript/{omniscript_id}"
-        },
-        {
-            'name': 'URL with different API version (v59.0)',
-            'url': f"/services/data/v59.0/connect/omniscript/{omniscript_id}?customType=Discovery+Framework"
-        }
-    ]
-    
-    for i, approach in enumerate(approaches, 1):
-        click.echo(f"\n🧪 Approach {i}: {approach['name']}")
-        click.echo(f"   URL: {approach['url']}")
-        
-        try:
-            response = client.sf.restful(approach['url'], method='GET')
-            if response.status_code == 200:
-                click.echo(f"   ✅ SUCCESS! Status: {response.status_code}")
-                result = response.json()
-                click.echo(f"   📄 Response keys: {list(result.keys())}")
-                return  # Stop on first success
-            else:
-                click.echo(f"   ❌ Failed with status: {response.status_code}")
-                click.echo(f"   📄 Response: {response.text[:200]}...")
-        except Exception as e:
-            click.echo(f"   💥 Exception: {str(e)[:200]}...")
-    
-    click.echo(f"\n🚨 All approaches failed. The Discovery Framework API may not be available in this org.")
-    
-    if raw_request:
-        click.echo(f"\n🧪 Trying raw HTTP requests...")
-        try_raw_requests(client, omniscript_id)
-    
-    click.echo(f"💡 Try checking:")
-    click.echo(f"   - OmniStudio permissions and licenses")
-    click.echo(f"   - API access permissions")
-    click.echo(f"   - Whether the Discovery Framework feature is enabled")
-
-
-def try_raw_requests(client: SalesforceClient, omniscript_id: str):
-    """Try making raw HTTP requests with different headers to match Workbench behavior."""
-    import requests
-    
-    base_url = f"https://{client.sf.sf_instance}"
-    api_url = f"/services/data/v62.0/connect/omniscript/{omniscript_id}?customType=Discovery+Framework"
-    full_url = base_url + api_url
-    
-    # Headers that mimic a browser/Workbench request
-    headers_variations = [
-        {
-            'name': 'Workbench-like headers',
-            'headers': {
-                'Authorization': f'Bearer {client.sf.session_id}',
-                'Accept': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (compatible; SalesforceWorkbench)',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json'
-            }
-        },
-        {
-            'name': 'Standard API headers',
-            'headers': {
-                'Authorization': f'Bearer {client.sf.session_id}',
-                'Accept': 'application/json',
-                'User-Agent': 'Python/simple-salesforce'
-            }
-        },
-        {
-            'name': 'Minimal headers',
-            'headers': {
-                'Authorization': f'Bearer {client.sf.session_id}',
-                'Accept': 'application/json'
-            }
-        }
-    ]
-    
-    for i, variation in enumerate(headers_variations, 1):
-        click.echo(f"\n🔬 Raw Request {i}: {variation['name']}")
-        click.echo(f"   URL: {full_url}")
-        click.echo(f"   Headers: {variation['headers']}")
-        
-        try:
-            response = requests.get(full_url, headers=variation['headers'], timeout=30)
-            click.echo(f"   📡 Status: {response.status_code}")
-            click.echo(f"   📋 Response Headers: {dict(response.headers)}")
-            
-            if response.status_code == 200:
-                click.echo(f"   ✅ SUCCESS with raw request!")
-                result = response.json()
-                click.echo(f"   📄 Response keys: {list(result.keys())}")
-                click.echo(f"   📊 First few lines of response:")
-                click.echo(f"   {str(result)[:300]}...")
-                return
-            else:
-                click.echo(f"   ❌ Failed: {response.text[:100]}...")
-                
-        except Exception as e:
-            click.echo(f"   💥 Exception: {str(e)[:100]}...")
-    
-    click.echo(f"\n🚨 All raw request approaches also failed.")
 
 
 if __name__ == '__main__':
