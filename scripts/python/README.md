@@ -23,16 +23,6 @@ Executes a SOQL query to retrieve all OmniScript processes and displays them in 
 - **Formatted Tables**: Structured headers and consistent styling
 - **Responsive Layout**: Tables adapt to terminal width and content length
 
-## General Technical Requirements
-
-1. Must be written as a python click script
-2. Must read the .env using python-dotenv to get SFDC credentials
-3. Must use salesforce credential flow with username/password/token
-4. Must allow for the .env to have a scheme for calling multiple instances, each with their own username/token/password
-5. Must allow the user to pass the .env instance scheme as an optional parameter.  If this parameter is not passed in, the default .env instance is chosen
-6. Must allow the user to pass the omniscript ID as a required parameter
-7. Must allow the user to pass an optional Path parameter, to which the script will also write the output.
-8. The python click script must be written to `scripts/python`
 
 ## Usage
 
@@ -52,7 +42,7 @@ Executes a SOQL query to retrieve all OmniScript processes and displays them in 
    DEFAULT_SF_USERNAME=your_username@example.com
    DEFAULT_SF_PASSWORD=your_password
    DEFAULT_SF_TOKEN=your_security_token
-   DEFAULT_SF_DOMAIN=login
+   DEFAULT_SF_DOMAIN=test
 
    # Optional: Additional instances
    PROD_SF_USERNAME=prod_user@example.com
@@ -218,3 +208,16 @@ python scripts/python/omniscript_discovery.py list --instance DEV
 ```
 
 **Note**: Output includes formatted tables and JSON syntax highlighting for improved readability.
+
+## General Technical Requirements
+
+These were used to generate the first cut of the python script.
+
+1. Must be written as a python click script
+2. Must read the .env using python-dotenv to get SFDC credentials
+3. Must use salesforce credential flow with username/password/token
+4. Must allow for the .env to have a scheme for calling multiple instances, each with their own username/token/password
+5. Must allow the user to pass the .env instance scheme as an optional parameter.  If this parameter is not passed in, the default .env instance is chosen
+6. Must allow the user to pass the omniscript ID as a required parameter
+7. Must allow the user to pass an optional Path parameter, to which the script will also write the output.
+8. The python click script must be written to `scripts/python`
