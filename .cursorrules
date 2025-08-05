@@ -1,0 +1,90 @@
+# Kicksaw Integration App
+
+- This project uses custom objects to log integration errors into Salesforce.
+
+```mermaid
+erDiagram
+    KicksawEng__Integration__c ||--|{ KicksawEng__IntegrationExecution__c : "has"
+    KicksawEng__IntegrationExecution__c ||--|{ KicksawEng__IntegrationLog__c : "has"
+
+    KicksawEng__Integration__c {
+        string Id PK
+        string Name
+    }
+
+    KicksawEng__IntegrationExecution__c {
+        string Id PK
+        string KicksawEng__Integration__c FK
+        longtext KicksawEng__ExecutionPayload__c
+        boolean KicksawEng__SuccessfulCompletion__c
+    }
+
+    KicksawEng__IntegrationLog__c {
+        string Id PK
+        string 	KicksawEng__IntegrationExecution__c FK
+        text KicksawEng__LogMessage__c
+    }
+```
+
+`KicksawEng__Integration__c` represent the integration itself, so each integration will have 1 record in Salesforce.
+
+`KicksawEng__IntegrationExecution__c` records represents each time when the integration executed. If the execution was successful, then Successful Completion will be marked true. If there are errors, then they would be logged in `KicksawEng__IntegrationLog__c` records, each error will have its own record. The error message will be in the `KicksawEng__LogMessage__c` field.
+
+- Here is how you use the integration app to log integration errors:
+
+## Usage
+
+###Apex Code
+
+```
+KicksawEng.KicksawLogger logger = new KicksawEng.KicksawLogger(<Kicksaw Integration App Name Here>);
+logger.log(<String> errorMessage)
+logger.log(<String> errorMessage, <Integer> statusCode)
+logger.log(<String> errorMessage, <Integer> statusCode, <String>recordId)
+
+logger.log(<Exception> e)
+logger.log(<HttpResponse> response)
+logger.log(Database.SaveResult[] databaseResults)
+
+logger.savePayload(<String> payload)
+
+logger.completeExecution()
+
+logger.saveLogs();
+```
+
+- Kicksaw Integration App Name is needed to create a Kicksaw Integration App record. If there is an existing record with the same name, the execution record will be using that as the parent
+- If the HttpResponse is logged, the status code and error messages will be extracted from the response
+- If Database.SaveResult[] is logged, each error from the results will create an Integration Log record
+- savePayload is used to populate the JSON payload- this will appear in the Integration Execution record
+- completeExecution- will check the checkbox 'Complete Execution' in the Integration Execution record- this means that the operation ran successfully with no error
+- saveLogs - this method needs to be called at the end for the Integration Execution and Logs to be created
+
+# Test Classes
+
+- When writing Apex test classes, use other test classes as an example
+- All records in Salesforce will need to be inserted in the testSetup method so that the tests will be successful
+- Integration Logs can be queried in test classes in cases where an error would be expected
+- Every time a new apex test class is created, a `.cls-meta.xml` file with the same name will need to be created with the following content
+
+```xml
+  <?xml version="1.0" encoding="UTF-8" ?>
+  <ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
+      <apiVersion>61.0</apiVersion>
+      <status>Active</status>
+  </ApexClass>
+```
+
+- Write test classes that provide as much code coverage as possible
+
+## SObject Mocking
+
+- The apex tests will need to use mock Sobjects here is the documentation for it: https://github.com/j-schreiber/js-salesforce-apex-utils/tree/master/src/packaged/main
+- The mock sobject can be queried using normal SOQL queries e.g. `Account account = [SELECT Id FROM Account LIMIT 1];`
+
+# General Rules
+
+- Set class does not have a get() method, it needs to use .iterator().next() to get the first element
+- Use the latest API version 63.0
+- Creating Opportunity requires an Account to be created first, then the Opportunity needs to relate to the inserted Account using AccountId field
+- Record type cannot be inserted, it can be queried since it is already created in the Salesforce org

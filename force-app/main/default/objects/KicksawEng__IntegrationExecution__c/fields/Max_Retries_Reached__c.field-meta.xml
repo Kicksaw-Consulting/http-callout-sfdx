@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Max_Retries_Reached__c</fullName>
+    <externalId>false</externalId>
+    <formula>Retries_Attempted__c &gt;=  KicksawEng__Integration__r.Maximum_Retries__c</formula>
+    <label>Max Retries Reached</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status_Code_in_Retry_List__c</fullName>
+    <externalId>false</externalId>
+    <formula>OR(
+(CONTAINS(
+        KicksawEng__IntegrationExecution__r.KicksawEng__Integration__r.Status_Codes_to_Retry__c,
+        TEXT(KicksawEng__StatusCode__c)
+    )
+),
+(KicksawEng__IntegrationExecution__r.KicksawEng__Integration__r.Status_Codes_to_Retry__c == null)
+)</formula>
+    <label>Status Code in Retry List</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

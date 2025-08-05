@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>KicksawEng__LatestExecution__c</fullName>
+    <deprecated>false</deprecated>
+    <description>The time which the latest execution of the integration ran.</description>
+    <externalId>false</externalId>
+    <label>Latest Execution</label>
+    <summarizedField>KicksawEng__IntegrationExecution__c.CreatedDate</summarizedField>
+    <summaryForeignKey>KicksawEng__IntegrationExecution__c.KicksawEng__Integration__c</summaryForeignKey>
+    <summaryOperation>max</summaryOperation>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

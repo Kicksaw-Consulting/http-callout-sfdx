@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Record_Id__c</fullName>
+    <description>If the integration execution failed and if it only has 1 record id, it will populate the record Id. This allows a formula to be used to link to the record.</description>
+    <externalId>false</externalId>
+    <label>Record Id</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

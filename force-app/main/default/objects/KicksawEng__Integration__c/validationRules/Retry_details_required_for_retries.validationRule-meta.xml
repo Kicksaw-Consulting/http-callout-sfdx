@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Retry_details_required_for_retries</fullName>
+    <active>true</active>
+    <description
+  >If Enable_Retry__c field is checked, the fields Apex_Class_for_Retry__c, Maximum_Retries__c, and Retry_Interval__c cannot be blank.</description>
+    <errorConditionFormula>AND(
+    Enable_Retry__c,
+    OR(
+        ISBLANK(Apex_Class_for_Retry__c),
+        ISBLANK(Maximum_Retries__c),
+        ISBLANK(Retry_Interval__c)
+    )
+)</errorConditionFormula>
+    <errorDisplayField>Apex_Class_for_Retry__c</errorDisplayField>
+    <errorMessage
+  >If Enable_Retry__c field is checked, the fields Apex_Class_for_Retry__c, Maximum_Retries__c, Retry_Interval__c, and Status_Codes_to_Retry__c cannot be blank.</errorMessage>
+</ValidationRule>

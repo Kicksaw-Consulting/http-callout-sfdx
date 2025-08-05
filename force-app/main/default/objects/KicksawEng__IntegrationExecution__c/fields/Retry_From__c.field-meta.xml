@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Retry_From__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <inlineHelpText>The Integration Execution Record that this is a retry of</inlineHelpText>
+    <label>Retry From</label>
+    <referenceTo>KicksawEng__IntegrationExecution__c</referenceTo>
+    <relationshipLabel>Integration Executions</relationshipLabel>
+    <relationshipName>Integration_Executions</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>
